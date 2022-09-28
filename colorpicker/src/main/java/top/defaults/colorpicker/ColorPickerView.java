@@ -3,28 +3,26 @@ package top.defaults.colorpicker;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
-import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import androidx.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import top.defaults.logger.Logger;
-
 public class ColorPickerView extends LinearLayout implements ColorObservable {
 
-    private ColorWheelView colorWheelView;
+    List<ColorObserver> observers = new ArrayList<>();
+    private final ColorWheelView colorWheelView;
     private BrightnessSliderView brightnessSliderView;
     private AlphaSliderView alphaSliderView;
     private ColorObservable observableOnDuty;
     private boolean onlyUpdateOnTouchEventUp;
-
     private int initialColor = Color.BLACK;
-
-    private int sliderMargin;
-    private int sliderHeight;
+    private final int sliderMargin;
+    private final int sliderHeight;
 
     public ColorPickerView(Context context) {
         this(context, null);
@@ -70,19 +68,19 @@ public class ColorPickerView extends LinearLayout implements ColorObservable {
         int maxWidth = MeasureSpec.getSize(widthMeasureSpec);
         int maxHeight = MeasureSpec.getSize(heightMeasureSpec);
         if (BuildConfig.DEBUG) {
-            Logger.d("maxWidth: %d, maxHeight: %d", maxWidth, maxHeight);
+            //Logger.d("maxWidth: %d, maxHeight: %d", maxWidth, maxHeight);
         }
 
         int desiredWidth = maxHeight - (getPaddingTop() + getPaddingBottom()) + (getPaddingLeft() + getPaddingRight());
         if (brightnessSliderView != null) {
             desiredWidth -= (sliderMargin + sliderHeight);
         }
-        if (alphaSliderView != null){
+        if (alphaSliderView != null) {
             desiredWidth -= (sliderMargin + sliderHeight);
         }
 
         if (BuildConfig.DEBUG) {
-            Logger.d("desiredWidth: %d", desiredWidth);
+            //Logger.d("desiredWidth: %d", desiredWidth);
         }
 
         int width = Math.min(maxWidth, desiredWidth);
@@ -95,7 +93,7 @@ public class ColorPickerView extends LinearLayout implements ColorObservable {
         }
 
         if (BuildConfig.DEBUG) {
-            Logger.d("width: %d, height: %d", width, height);
+            //Logger.d("width: %d, height: %d", width, height);
         }
         super.onMeasure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.getMode(widthMeasureSpec)),
                 MeasureSpec.makeMeasureSpec(height, MeasureSpec.getMode(heightMeasureSpec)));
@@ -157,7 +155,7 @@ public class ColorPickerView extends LinearLayout implements ColorObservable {
 
     private void updateObservableOnDuty() {
         if (observableOnDuty != null) {
-            for (ColorObserver observer: observers) {
+            for (ColorObserver observer : observers) {
                 observableOnDuty.unsubscribe(observer);
             }
         }
@@ -194,8 +192,6 @@ public class ColorPickerView extends LinearLayout implements ColorObservable {
     public void reset() {
         colorWheelView.setColor(initialColor, true);
     }
-
-    List<ColorObserver> observers = new ArrayList<>();
 
     @Override
     public void subscribe(ColorObserver observer) {
